@@ -12,7 +12,8 @@ app = FastAPI(title="StrideMap API")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    # El frontend de Next.js puede arrancar en 3000 o, si está ocupado, en 3001.
+    allow_origin_regex=r"http://localhost:\d+",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

@@ -6,10 +6,10 @@ import type { FeatureCollection } from "geojson";
 import L from "leaflet";
 
 const SERVICE_COLORS: Record<string, string> = {
-  health: "#e74c3c",
-  education: "#3498db",
-  greens: "#27ae60",
-  work: "#8e44ad",
+  health: "#D55E00",
+  education: "#0072B2",
+  greens: "#009E73",
+  work: "#CC79A7",
 };
 
 const SERVICE_LABELS: Record<string, string> = {
@@ -27,16 +27,34 @@ interface MapViewProps {
   metrics: Record<string, number>;
 }
 
-function FitBounds({ homes }: { homes: FeatureCollection }) {
+function MapController({ homes, boundary }: { homes: FeatureCollection; boundary: FeatureCollection }) {
   const map = useMap();
 
   useEffect(() => {
-    if (homes.features.length === 0) return;
-    const bounds = L.geoJSON(homes).getBounds();
-    if (bounds.isValid()) {
-      map.fitBounds(bounds, { padding: [30, 30] });
-    }
-  }, [homes, map]);
+    // Prefer the district boundary so the map always stays centered on the area,
+    // falling back to the homes if no boundary geometry is available.
+    const fit = () => {
+      const source = boundary.features.length > 0 ? boundary : homes;
+      if (source.features.length === 0) return;
+      const bounds = L.geoJSON(source).getBounds();
+      if (bounds.isValid()) {
+        map.fitBounds(bounds, { padding: [30, 30] });
+      }
+    };
+
+    // Leaflet measures the container size once at mount. Inside a window/modal
+    // that opens dynamically the initial size can be 0, leaving the tiles blank
+    // until the size is recalculated — so force a recompute on mount, shortly
+    // after, and whenever the container resizes (drag/maximize).
+    map.invalidateSize();
+    fit();
+    const t = setTimeout(() => { map.invalidateSize(); fit(); }, 200);
+
+    const ro = new ResizeObserver(() => map.invalidateSize());
+    ro.observe(map.getContainer());
+
+    return () => { clearTimeout(t); ro.disconnect(); };
+  }, [homes, boundary, map]);
 
   return null;
 }
@@ -54,8 +72,8 @@ export default function MapView({ boundary, homes, services, title, metrics }: M
           center={[coords[1], coords[0]]}
           radius={3}
           pathOptions={{
-            color: covered ? "#2ecc71" : "#e74c3c",
-            fillColor: covered ? "#2ecc71" : "#e74c3c",
+            color: covered ? "#009E73" : "#D55E00",
+            fillColor: covered ? "#009E73" : "#D55E00",
             fillOpacity: 0.7,
             weight: 1,
           }}
@@ -67,7 +85,7 @@ export default function MapView({ boundary, homes, services, title, metrics }: M
   const serviceMarkers = useMemo(() => {
     const markers: React.ReactElement[] = [];
     Object.entries(services).forEach(([cat, geojson]) => {
-      const color = SERVICE_COLORS[cat] || "#95a5a6";
+      const color = SERVICE_COLORS[cat] || "#999999";
       geojson.features.forEach((feature, i) => {
         const coords = (feature.geometry as GeoJSON.Point).coordinates;
         markers.push(
@@ -97,14 +115,14 @@ export default function MapView({ boundary, homes, services, title, metrics }: M
         zoomControl={true}
       >
         <TileLayer
-          url="https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png"
-          attribution="OpenStreetMap HOT"
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
         />
-        <FitBounds homes={homes} />
+        <MapController homes={homes} boundary={boundary} />
         <GeoJSON
           data={boundary}
           style={{
-            color: "#4a3525",
+            color: "#333333",
             weight: 3,
             opacity: 0.8,
             fillColor: "transparent",
@@ -122,31 +140,31 @@ export default function MapView({ boundary, homes, services, title, metrics }: M
         top: 12,
         right: 12,
         zIndex: 1000,
-        background: "var(--xp-cream)",
-        border: "1px solid var(--xp-border)",
+        background: "#F7F7F7",
+        border: "1px solid #BFBFBF",
         borderRadius: 8,
         padding: 12,
         fontSize: 12,
-        boxShadow: "2px 2px 8px var(--xp-shadow)",
+        boxShadow: "2px 2px 8px rgba(0,0,0,0.2)",
         minWidth: 180,
       }}>
-        <div style={{ fontWeight: 700, marginBottom: 4, color: "var(--xp-green)" }}>{title}</div>
+        <div style={{ fontWeight: 700, marginBottom: 4, color: "#333333" }}>{title}</div>
         {covAll && (
-          <div style={{ marginBottom: 8, fontSize: 11, color: "var(--xp-brown)" }}>
+          <div style={{ marginBottom: 8, fontSize: 11, color: "#333333" }}>
             <strong>Total coverage: {covAll}%</strong>
           </div>
         )}
-        <div style={{ borderTop: "1px solid var(--xp-beige)", paddingTop: 6, marginBottom: 4 }}>
-          <span style={{ color: "#2ecc71" }}>●</span> Covered home
+        <div style={{ borderTop: "1px solid #E6E6E6", paddingTop: 6, marginBottom: 4 }}>
+          <span style={{ color: "#009E73" }}>●</span> Covered home
         </div>
         <div style={{ marginBottom: 6 }}>
-          <span style={{ color: "#e74c3c" }}>●</span> Uncovered home
+          <span style={{ color: "#D55E00" }}>●</span> Uncovered home
         </div>
-        <div style={{ borderTop: "1px solid var(--xp-beige)", paddingTop: 6 }}>
+        <div style={{ borderTop: "1px solid #E6E6E6", paddingTop: 6 }}>
           {Object.entries(SERVICE_LABELS).map(([cat, label]) => (
             <div key={cat} style={{ marginBottom: 2 }}>
               <span style={{ color: SERVICE_COLORS[cat] }}>●</span> {label}{" "}
-              <span style={{ color: "var(--xp-border)", fontSize: 10 }}>
+              <span style={{ color: "#BFBFBF", fontSize: 10 }}>
                 ({services[cat]?.features.length || 0})
               </span>
             </div>

@@ -43,3 +43,6 @@ class OptimizationResult(BaseModel):
     homes_optimized: dict
     services_initial: dict[str, dict]
     services_optimized: dict[str, dict]
+    evolution: list[dict] = []
+    pareto: list[dict] = []
+    explored: list[dict] = []

@@ -49,15 +49,15 @@ def plot_exchange_evolution(callback: EvolutionCallback, output_dir: str):
     # Gráfico 1: Evolución de intercambios promedio
     ax1 = axes[0, 0]
     ax1.plot(stats_df['generation'], stats_df['mean_exchanges'],
-             label='Promedio', linewidth=2, color='blue')
+             label='Promedio', linewidth=2, color='#0072B2')
     ax1.fill_between(stats_df['generation'],
                      stats_df['mean_exchanges'] - stats_df['std_exchanges'],
                      stats_df['mean_exchanges'] + stats_df['std_exchanges'],
-                     alpha=0.3, color='blue', label='±1 Desviación Estándar')
+                     alpha=0.3, color='#0072B2', label='±1 Desviación Estándar')
     ax1.plot(stats_df['generation'], stats_df['min_exchanges'],
-             '--', label='Mínimo', linewidth=1, color='green', alpha=0.7)
+             '--', label='Mínimo', linewidth=1, color='#009E73', alpha=0.7)
     ax1.plot(stats_df['generation'], stats_df['max_exchanges'],
-             '--', label='Máximo', linewidth=1, color='red', alpha=0.7)
+             '--', label='Máximo', linewidth=1, color='#D55E00', alpha=0.7)
     ax1.set_xlabel('Generación', fontsize=11)
     ax1.set_ylabel('Número de Intercambios', fontsize=11)
     ax1.set_title('Evolución de Intercambios por Generación', fontsize=12, fontweight='bold')
@@ -89,9 +89,9 @@ def plot_exchange_evolution(callback: EvolutionCallback, output_dir: str):
     ax3 = axes[1, 0]
     if 'best_objective' in stats_df.columns and 'mean_objective' in stats_df.columns:
         ax3.plot(stats_df['generation'], stats_df['best_objective'],
-                label='Mejor Objetivo', linewidth=2, color='green')
+                label='Mejor Objetivo', linewidth=2, color='#009E73')
         ax3.plot(stats_df['generation'], stats_df['mean_objective'],
-                label='Objetivo Promedio', linewidth=2, color='orange')
+                label='Objetivo Promedio', linewidth=2, color='#E69F00')
         ax3.set_xlabel('Generación', fontsize=11)
         ax3.set_ylabel('Valor del Objetivo', fontsize=11)
         ax3.set_title('Convergencia del Algoritmo', fontsize=12, fontweight='bold')
@@ -106,10 +106,10 @@ def plot_exchange_evolution(callback: EvolutionCallback, output_dir: str):
     ax4 = axes[1, 1]
     if not tracked_df.empty:
         all_exchanges = tracked_df['n_exchanges'].values
-        ax4.hist(all_exchanges, bins=20, edgecolor='black', alpha=0.7, color='steelblue')
-        ax4.axvline(np.mean(all_exchanges), color='red', linestyle='--',
+        ax4.hist(all_exchanges, bins=20, edgecolor='black', alpha=0.7, color='#0072B2')
+        ax4.axvline(np.mean(all_exchanges), color='#D55E00', linestyle='--',
                    linewidth=2, label=f'Promedio: {np.mean(all_exchanges):.1f}')
-        ax4.axvline(np.median(all_exchanges), color='green', linestyle='--',
+        ax4.axvline(np.median(all_exchanges), color='#009E73', linestyle='--',
                    linewidth=2, label=f'Mediana: {np.median(all_exchanges):.1f}')
         ax4.set_xlabel('Número de Intercambios', fontsize=11)
         ax4.set_ylabel('Frecuencia', fontsize=11)
@@ -141,7 +141,7 @@ def plot_exchange_evolution(callback: EvolutionCallback, output_dir: str):
                for gen in tracked_generations]
 
         bars = ax.bar(positions, means, yerr=stds, capsize=5, alpha=0.7,
-                     color='steelblue', edgecolor='black', linewidth=1.5)
+                     color='#0072B2', edgecolor='black', linewidth=1.5)
 
         ax.set_xlabel('Generación', fontsize=12, fontweight='bold')
         ax.set_ylabel('Intercambios Promedio', fontsize=12, fontweight='bold')
@@ -281,7 +281,7 @@ def plot_pareto_front(pareto_df: pd.DataFrame, output_dir: str):
         if best_idx is not None:
             ax.scatter(pareto_df.loc[best_idx, xcol],
                       pareto_df.loc[best_idx, ycol],
-                      s=200, marker='*', color='red', edgecolors='black',
+                      s=200, marker='*', color='#D55E00', edgecolors='black',
                       linewidth=2, label='Solución óptima', zorder=5)
         ax.set_xlabel(xlabel, fontsize=11, fontweight='bold')
         ax.set_ylabel(ylabel, fontsize=11, fontweight='bold')
@@ -300,7 +300,7 @@ def plot_pareto_front(pareto_df: pd.DataFrame, output_dir: str):
     if best_idx is not None:
         ax4.scatter(pareto_df.loc[best_idx, 'change_ratio'],
                    avg_coverage_deficit.loc[best_idx],
-                   s=200, marker='*', color='red', edgecolors='black',
+                   s=200, marker='*', color='#D55E00', edgecolors='black',
                    linewidth=2, label='Solución óptima', zorder=5)
     ax4.set_xlabel('Change Ratio', fontsize=11, fontweight='bold')
     ax4.set_ylabel('Déficit de Cobertura Promedio', fontsize=11, fontweight='bold')
@@ -313,10 +313,10 @@ def plot_pareto_front(pareto_df: pd.DataFrame, output_dir: str):
     # Gráfico 5: Distribución del Score
     ax5 = plt.subplot(3, 3, 5)
     if 'score' in pareto_df.columns:
-        ax5.hist(pareto_df['score'], bins=20, edgecolor='black', alpha=0.7, color='steelblue')
-        ax5.axvline(pareto_df['score'].min(), color='red', linestyle='--',
+        ax5.hist(pareto_df['score'], bins=20, edgecolor='black', alpha=0.7, color='#0072B2')
+        ax5.axvline(pareto_df['score'].min(), color='#D55E00', linestyle='--',
                    linewidth=2, label=f'Óptimo: {pareto_df["score"].min():.4f}')
-        ax5.axvline(pareto_df['score'].mean(), color='green', linestyle='--',
+        ax5.axvline(pareto_df['score'].mean(), color='#009E73', linestyle='--',
                    linewidth=2, label=f'Promedio: {pareto_df["score"].mean():.4f}')
         ax5.set_xlabel('Score', fontsize=11, fontweight='bold')
         ax5.set_ylabel('Frecuencia', fontsize=11, fontweight='bold')
@@ -340,7 +340,7 @@ def plot_pareto_front(pareto_df: pd.DataFrame, output_dir: str):
     if best_idx is not None:
         ax6.scatter(pareto_df.loc[best_idx, 'change_ratio'],
                    avg_coverage.loc[best_idx] * 100,
-                   s=300, marker='*', color='gold', edgecolors='black',
+                   s=300, marker='*', color='#E69F00', edgecolors='black',
                    linewidth=2, label='Solución óptima', zorder=5)
     ax6.set_xlabel('Change Ratio (Proporción de Cambios)', fontsize=11, fontweight='bold')
     ax6.set_ylabel('Cobertura Promedio (%)', fontsize=11, fontweight='bold')
@@ -393,7 +393,7 @@ def plot_pareto_front(pareto_df: pd.DataFrame, output_dir: str):
         """
     ax7.text(0.1, 0.9, stats_text, transform=ax7.transAxes,
             fontsize=9, verticalalignment='top', family='monospace',
-            bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.5))
+            bbox=dict(boxstyle='round', facecolor='#F2F2F2', alpha=0.5))
 
     # Gráfico 8: Trade-off análisis
     ax8 = plt.subplot(3, 3, 9)
@@ -409,7 +409,7 @@ def plot_pareto_front(pareto_df: pd.DataFrame, output_dir: str):
     if best_idx is not None:
         ax8.scatter(pareto_df.loc[best_idx, 'change_ratio'],
                    avg_coverage.loc[best_idx],
-                   s=300, marker='*', color='red', edgecolors='black',
+                   s=300, marker='*', color='#D55E00', edgecolors='black',
                    linewidth=2, label='Solución óptima', zorder=5)
 
     if len(pareto_df) > 10:
@@ -500,9 +500,9 @@ def plot_coverage_comparison(initial_metrics: Dict[str, float],
     width = 0.35
 
     bars1 = ax1.bar(x - width/2, [v * 100 for v in initial_covs], width,
-                   label='Estado Inicial', color='#ff6b6b', alpha=0.8, edgecolor='black', linewidth=1)
+                   label='Estado Inicial', color='#D55E00', alpha=0.8, edgecolor='black', linewidth=1)
     bars2 = ax1.bar(x + width/2, [v * 100 for v in final_covs], width,
-                   label='Estado Optimizado', color='#51cf66', alpha=0.8, edgecolor='black', linewidth=1)
+                   label='Estado Optimizado', color='#009E73', alpha=0.8, edgecolor='black', linewidth=1)
 
     for i, (bar1, bar2) in enumerate(zip(bars1, bars2)):
         height1 = bar1.get_height()
@@ -521,7 +521,7 @@ def plot_coverage_comparison(initial_metrics: Dict[str, float],
     ax1.grid(True, alpha=0.3, axis='y')
     ax1.set_ylim(0, max(max(initial_covs), max(final_covs)) * 100 * 1.15)
 
-    colors = ['#4dabf7' if imp >= 0 else '#ff8787' for imp in improvements]
+    colors = ['#0072B2' if imp >= 0 else '#D55E00' for imp in improvements]
     bars3 = ax2.barh(labels, [imp * 100 for imp in improvements],
                      color=colors, alpha=0.8, edgecolor='black', linewidth=1)
 
@@ -571,8 +571,7 @@ def create_state_map(
         location=center,
         zoom_start=14,
         control_scale=True,
-        tiles="https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png",
-        attr="OpenStreetMap HOT",
+        tiles="OpenStreetMap",
     )
 
     # Límite del distrito
@@ -590,10 +589,10 @@ def create_state_map(
 
     # Colores de servicio
     SERVICE_COLORS = {
-        "health": "#e74c3c",
-        "education": "#3498db",
-        "greens": "#27ae60",
-        "work": "#8e44ad",
+        "health": "#D55E00",
+        "education": "#0072B2",
+        "greens": "#009E73",
+        "work": "#CC79A7",
     }
     SERVICE_LABELS = {
         "health": "Salud",
@@ -613,9 +612,9 @@ def create_state_map(
             folium.CircleMarker(
                 [row.geometry.y, row.geometry.x],
                 radius=3,
-                color='#2ecc71',
+                color='#009E73',
                 fill=True,
-                fillColor='#2ecc71',
+                fillColor='#009E73',
                 fillOpacity=0.7,
                 weight=1,
                 tooltip="Hogar: cubierto"
@@ -625,9 +624,9 @@ def create_state_map(
             folium.CircleMarker(
                 [row.geometry.y, row.geometry.x],
                 radius=3,
-                color='#e74c3c',
+                color='#D55E00',
                 fill=True,
-                fillColor='#e74c3c',
+                fillColor='#D55E00',
                 fillOpacity=0.7,
                 weight=1,
                 tooltip="Hogar: NO cubierto"
@@ -637,9 +636,9 @@ def create_state_map(
             folium.CircleMarker(
                 [row.geometry.y, row.geometry.x],
                 radius=3,
-                color='#34495e',
+                color='#4D4D4D',
                 fill=True,
-                fillColor='#34495e',
+                fillColor='#4D4D4D',
                 fillOpacity=0.6,
                 weight=1,
                 tooltip="Hogar"
@@ -647,7 +646,7 @@ def create_state_map(
 
     # Servicios (una capa por categoría para poder alternarlas)
     for cat, gdf in services.items():
-        color = SERVICE_COLORS.get(cat, '#95a5a6')
+        color = SERVICE_COLORS.get(cat, '#999999')
         label = SERVICE_LABELS.get(cat, cat)
         fg = folium.FeatureGroup(name=label, show=True).add_to(m)
 
@@ -673,11 +672,11 @@ def create_state_map(
     home_legend = ""
     if has_coverage:
         home_legend = (
-            "<p style='margin:3px 0'><span style='color:#2ecc71'>&#9679;</span> Hogar cubierto</p>"
-            "<p style='margin:3px 0'><span style='color:#e74c3c'>&#9679;</span> Hogar NO cubierto</p>"
+            "<p style='margin:3px 0'><span style='color:#009E73'>&#9679;</span> Hogar cubierto</p>"
+            "<p style='margin:3px 0'><span style='color:#D55E00'>&#9679;</span> Hogar NO cubierto</p>"
         )
     else:
-        home_legend = "<p style='margin:3px 0'><span style='color:#34495e'>&#9679;</span> Hogar</p>"
+        home_legend = "<p style='margin:3px 0'><span style='color:#4D4D4D'>&#9679;</span> Hogar</p>"
 
     service_legend = ""
     for cat in ["health", "education", "greens", "work"]:

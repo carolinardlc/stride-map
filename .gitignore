@@ -22,3 +22,6 @@ frontend/out/
 # IDE
 .vscode/
 .idea/
+
+# Claude Code (config local del agente)
+.claude/

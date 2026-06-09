@@ -45,6 +45,23 @@ const IconSVGs: Record<string, React.ReactNode> = {
       <path d="M12 20c4 6 8-4 12 0" stroke="#4a7c59" strokeWidth="1.5" fill="none" strokeDasharray="2 2"/>
     </svg>
   ),
+  methodology: (
+    <svg width="48" height="48" viewBox="0 0 48 48">
+      {/* Folder back */}
+      <path d="M4 14h14l3 3h23v25H4V14z" fill="#d8c8a8" stroke="#8c7e6a" strokeWidth="1.5"/>
+      {/* Folder front */}
+      <path d="M4 18h40v22H4V18z" fill="#e8dcc8" stroke="#8c7e6a" strokeWidth="1.5"/>
+      {/* Flow nodes */}
+      <circle cx="13" cy="29" r="3" fill="#4a7c59" stroke="#3d6b4a" strokeWidth="0.8"/>
+      <circle cx="24" cy="29" r="3" fill="#e74c3c" stroke="#c0392b" strokeWidth="0.8"/>
+      <circle cx="35" cy="29" r="3" fill="#3498db" strokeWidth="0.8"/>
+      {/* Arrows between nodes */}
+      <line x1="16.5" y1="29" x2="20.5" y2="29" stroke="#6b4f36" strokeWidth="1"/>
+      <line x1="27.5" y1="29" x2="31.5" y2="29" stroke="#6b4f36" strokeWidth="1"/>
+      <polygon points="20.5,29 19,28 19,30" fill="#6b4f36"/>
+      <polygon points="31.5,29 30,28 30,30" fill="#6b4f36"/>
+    </svg>
+  ),
 };
 
 interface DesktopIconProps {

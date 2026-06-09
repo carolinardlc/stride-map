@@ -70,6 +70,9 @@ async def get_job_result(job_id: str):
         homes_optimized=r["homes_optimized"],
         services_initial=r["services_initial"],
         services_optimized=r["services_optimized"],
+        evolution=r.get("evolution", []),
+        pareto=r.get("pareto", []),
+        explored=r.get("explored", []),
     )
 
 

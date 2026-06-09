@@ -193,6 +193,9 @@ class EvolutionCallback(Callback):
         self.generation_data: Dict[int, Dict] = {}
         self.exchange_tracking: List[ExchangeTracker] = []
         self.evolution_history: List[Dict] = []
+        # Objetivos de TODA la población en cada generación: lista de (gen, F).
+        # Permite reconstruir el espacio de objetivos explorado por NSGA-II.
+        self.objective_history: List[tuple] = []
 
     def notify(self, algorithm):
         try:
@@ -253,6 +256,14 @@ class EvolutionCallback(Callback):
         self.generation_data[generation] = stats
         self.evolution_history.append(stats)
 
+        # Guarda los objetivos de la población completa de esta generación.
+        try:
+            F_arr = np.asarray(F, dtype=float)
+            if F_arr.ndim == 2 and F_arr.shape[1] >= 5:
+                self.objective_history.append((generation, F_arr.copy()))
+        except Exception:
+            pass
+
     def get_exchange_stats(self) -> pd.DataFrame:
         if not self.evolution_history:
             return pd.DataFrame()
@@ -272,6 +283,43 @@ class EvolutionCallback(Callback):
             })
 
         return pd.DataFrame(data)
+
+    def get_explored_objectives(self, round_decimals: int = 4) -> pd.DataFrame:
+        """Espacio de objetivos explorado por NSGA-II (todas las generaciones).
+
+        Devuelve un DataFrame con las mismas columnas que el frente de Pareto
+        (déficits + change_ratio CRUDO), más la generación en que apareció cada
+        punto. Se deduplican los puntos por sus objetivos redondeados para
+        mantener la forma de la nube sin inflar el tamaño.
+        """
+        if not self.objective_history:
+            return pd.DataFrame()
+
+        rows = []
+        for gen, F in self.objective_history:
+            if getattr(F, "ndim", 0) != 2 or F.shape[1] < 5:
+                continue
+            for f in F:
+                rows.append({
+                    "1-cov_health": float(f[0]),
+                    "1-cov_education": float(f[1]),
+                    "1-cov_greens": float(f[2]),
+                    "1-cov_work": float(f[3]),
+                    "change_ratio": float(f[4]) / 5.0,  # crudo (F[:,4] = 5 * change_ratio)
+                    "generation": int(gen),
+                })
+
+        df = pd.DataFrame(rows)
+        if df.empty:
+            return df
+
+        key_cols = ["1-cov_health", "1-cov_education", "1-cov_greens", "1-cov_work", "change_ratio"]
+        df["_k"] = df[key_cols].round(round_decimals).apply(tuple, axis=1)
+        df = (df.sort_values("generation")
+                .drop_duplicates("_k", keep="first")
+                .drop(columns="_k")
+                .reset_index(drop=True))
+        return df
 
     def export_detailed_stats(self, output_dir: str):
         os.makedirs(output_dir, exist_ok=True)

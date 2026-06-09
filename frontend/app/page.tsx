@@ -4,8 +4,10 @@ import { useState } from "react";
 import DesktopIcon from "@/components/DesktopIcon";
 import AboutWindow from "@/components/AboutWindow";
 import MapWindow from "@/components/MapWindow";
+import MethodologyWindow from "@/components/MethodologyWindow";
+import SeminarioWindow from "@/components/SeminarioWindow";
 
-type OpenWindow = "about" | "presentation" | "maps" | null;
+type OpenWindow = "about" | "presentation" | "maps" | "methodology" | null;
 
 export default function Desktop() {
   const [openWindow, setOpenWindow] = useState<OpenWindow>(null);
@@ -85,7 +87,8 @@ export default function Desktop() {
         zIndex: 10,
       }}>
         <DesktopIcon icon="document" label="About" onClick={() => setOpenWindow("about")} />
-        <DesktopIcon icon="presentation" label="Presentation" onClick={() => setOpenWindow("presentation")} />
+        <DesktopIcon icon="presentation" label="Seminario" onClick={() => setOpenWindow("presentation")} />
+        <DesktopIcon icon="methodology" label="graficos_metodologia" onClick={() => setOpenWindow("methodology")} />
       </div>
 
       {/* Right icons */}
@@ -153,7 +156,10 @@ export default function Desktop() {
             fontSize: 11,
             boxShadow: "inset 0 1px 0 rgba(255,255,255,0.1)",
           }}>
-            {openWindow === "about" ? "About" : openWindow === "maps" ? "StrideMap" : "Presentation"}
+            {openWindow === "about" ? "About"
+              : openWindow === "maps" ? "StrideMap"
+              : openWindow === "methodology" ? "graficos_metodologia"
+              : "Seminario"}
           </div>
         )}
 
@@ -173,21 +179,11 @@ export default function Desktop() {
       {/* Windows */}
       {openWindow === "about" && <AboutWindow onClose={() => setOpenWindow(null)} />}
 
-      {openWindow === "presentation" && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ background: "rgba(0,0,0,0.25)" }}>
-          <div className="xp-window" style={{ width: 400 }}>
-            <div className="xp-titlebar">
-              <span>Presentation</span>
-              <button className="xp-titlebar-btn" onClick={() => setOpenWindow(null)}>✕</button>
-            </div>
-            <div style={{ padding: 32, textAlign: "center", color: "var(--xp-border)", fontSize: 13 }}>
-              Presentation content coming soon
-            </div>
-          </div>
-        </div>
-      )}
+      {openWindow === "presentation" && <SeminarioWindow onClose={() => setOpenWindow(null)} />}
 
       {openWindow === "maps" && <MapWindow onClose={() => setOpenWindow(null)} />}
+
+      {openWindow === "methodology" && <MethodologyWindow onClose={() => setOpenWindow(null)} />}
     </div>
   );
 }

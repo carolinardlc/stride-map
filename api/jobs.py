@@ -184,6 +184,22 @@ def run_optimization_sync(job: Job):
         for cat, gdf in final_services.items():
             services_optimized_geojson[cat] = _gdf_to_geojson(gdf)
 
+        evolution_history = list(callback.evolution_history) if callback else []
+        pareto_records = []
+        if pareto_df is not None and not pareto_df.empty:
+            pareto_records = json.loads(
+                pareto_df.replace({np.nan: None}).to_json(orient="records")
+            )
+
+        # Espacio de objetivos explorado por NSGA-II (todas las generaciones)
+        explored_records = []
+        if callback is not None:
+            explored_df = callback.get_explored_objectives()
+            if not explored_df.empty:
+                explored_records = json.loads(
+                    explored_df.replace({np.nan: None}).to_json(orient="records")
+                )
+
         # Store result
         job.result = {
             "place": p["place"],
@@ -195,6 +211,9 @@ def run_optimization_sync(job: Job):
             "homes_optimized": _gdf_to_geojson(homes_optimized_out),
             "services_initial": services_initial_geojson,
             "services_optimized": services_optimized_geojson,
+            "evolution": evolution_history,
+            "pareto": pareto_records,
+            "explored": explored_records,
         }
 
         # Save to disk cache
